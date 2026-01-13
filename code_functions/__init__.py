@@ -1,1 +1,1 @@
-import code_functions.add
+from code_functions.math import add
