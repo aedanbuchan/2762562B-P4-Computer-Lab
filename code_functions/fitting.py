@@ -1,3 +1,8 @@
+import numpy as np
+from scipy import optimize  # <-- this is needed for optimize.curve_fit
+import matplotlib.pyplot as plt
+
+
 ## Defining linear function for curve fitting
 def linear(x, m, c):
     return m*x + c
