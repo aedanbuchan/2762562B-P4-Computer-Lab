@@ -29,7 +29,7 @@ def sim_dataset(x_size, y_size, max_intensity, gaussian_noise_std, lam):
     amp1 = np.random.randint(0, 100)
     amp2 = np.random.randint(0, 100)
     
-    # Phases (use uniform random floats)
+    # Phases
     phase1 = np.random.randint(0, 2*np.pi)
     phase2 = np.random.randint(0, 2*np.pi)
 
