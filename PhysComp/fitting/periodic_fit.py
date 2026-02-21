@@ -16,6 +16,10 @@ def periodic_fit_plot(x_variable, y_variable, initial, plot=False):
     ss_tot = np.sum((y_variable - np.mean(y_variable))**2)
     r_squared = 1 - ss_res/ss_tot if ss_tot != 0 else np.nan
 
+    ## Rounding frequencies, ensuring single values at 0/360
+    params_sin[1] = np.round(params_sin[1], decimals=0)
+    params_sin[4] = np.round(params_sin[4], decimals=0)
+    
     if plot:
         fig, (ax1, ax2) = plt.subplots(
             2, 1, gridspec_kw={'height_ratios': [2,1]},
