@@ -1,7 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
-import numpy as np
 
 def sim_dataset(x_size, y_size, max_intensity, gaussian_noise_std, lam):
     """
