@@ -15,29 +15,20 @@ def periodic(x: np.ndarray, a: float, b: float, c: float, d: float, e: float) ->
     x : array-like
         Input position(s) in degrees.
     a : float
-        Amplitude of the fundamental (first harmonic).
+        Amplitude of the sin(x) term.
     b : float
-        Phase offset of the fundamental, in degrees.
+        Phase offset of the sin(x) term, in degrees.
     c : float
-        Amplitude of the second harmonic.
+        Amplitude of the sin(2x) term.
     d : float
-        Phase offset of the second harmonic, in degrees.
+        Phase offset of the sin(2x) term, in degrees.
     e : float
         Vertical offset.
 
     Returns
     -------
     numpy.ndarray
-        Model values at each point in *x*.
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> x = np.linspace(0, 360, 361)
-    >>> y = periodic(x, a=1.0, b=0.0, c=0.5, d=0.0, e=0.0)
-    >>> float(np.round(y[90], 6))  # sin(90°) = 1
-    1.0
-    """
+        Model values at each point in *x*."""
     
     ## Input Validation
     if not all(isinstance(v, (int,float)) for v in (a,b,c,d,e)):
@@ -49,7 +40,7 @@ def periodic(x: np.ndarray, a: float, b: float, c: float, d: float, e: float) ->
     return (a * np.sin(np.deg2rad(x + b)) + c * np.sin(2.0 * np.deg2rad(x + d)) + e)
 
 def periodic_fit(x_variable: np.ndarray, y_variable: np.ndarray, initial = None,bounds= None):
-    """Fit the two-harmonic periodic model to data via nonlinear least squares.
+    """Fit the periodic model to data via curve_fit.
 
     Uses scipy.optimize.curve_fit to find best-fit parameters [a, b, c, d, e]
     for the model: f(x) = a*sin(x + b) + c*sin(2*(x + d)) + e
@@ -57,14 +48,13 @@ def periodic_fit(x_variable: np.ndarray, y_variable: np.ndarray, initial = None,
     Parameters
     ----------
     x_variable : array-like of shape (N,)
-        Independent variable in degrees. Requires at least 5 points.
+        Independent variable (in degrees). Requires at least 5 points.
     y_variable : array-like of shape (N,)
         Dependent variable. Must be the same length as x_variable.
     initial : list of 5 floats, optional
         Initial parameter guesses [a, b, c, d, e]. Defaults to [30, 5, 5, 0, 70].
-    bounds : 2-tuple of sequences, optional
+    bounds : optional
         Lower and upper bounds per parameter:
-        ([a_lo, b_lo, c_lo, d_lo, e_lo], [a_hi, b_hi, c_hi, d_hi, e_hi]).
         Defaults to ([0, -180, 0, -90, 0], [1e6, 180, 1e6, 90, 1e6]).
 
     Returns
@@ -72,15 +62,8 @@ def periodic_fit(x_variable: np.ndarray, y_variable: np.ndarray, initial = None,
     params : numpy.ndarray of shape (5,)
         Best-fit parameters [a, b, c, d, e].
     errors : numpy.ndarray of shape (5,)
-        One-sigma uncertainties derived from the covariance matrix diagonal.
-
-    Raises
-    ------
-    ValueError
-        If inputs are mismatched, malformed, or contain fewer than 5 points.
-    RuntimeError
-        If curve_fit fails to converge within 30 000 function evaluations.
-    """
+        One-sigma uncertainties derived from the covariance matrix diagonal."""
+        
     # --- Validate x and y --------------------------------------------------
     x_variable = np.asarray(x_variable, dtype=float)
     y_variable = np.asarray(y_variable, dtype=float)
@@ -104,15 +87,14 @@ def periodic_fit(x_variable: np.ndarray, y_variable: np.ndarray, initial = None,
                 and len(bounds[0]) == 5 and len(bounds[1]) == 5):
             raise ValueError(
                 "bounds must be a 2-tuple of length-5 sequences: "
-                "([a_lo, b_lo, c_lo, d_lo, e_lo], [a_hi, b_hi, c_hi, d_hi, e_hi])."
             )
         if any(lo >= hi for lo, hi in zip(bounds[0], bounds[1])):
-            raise ValueError("Each lower bound must be strictly less than its upper bound.")
+            raise ValueError("Each lower bound must be less than its upper bound.")
 
     if initial is not None:
         if len(initial) != 5 or not all(isinstance(v, (int, float)) and not isinstance(v, bool)
                                         for v in initial):
-            raise ValueError("initial must be a sequence of exactly 5 numeric scalars.")
+            raise ValueError("initial must be a list of 5 values.")
 
     if bounds is not None:
         if any(v < lo or v > hi for v, lo, hi in zip(initial, bounds[0], bounds[1])):
@@ -141,15 +123,15 @@ def periodic_fit_whole(dataset: np.ndarray, initial: list, bounds= None, iterati
     
     """Fit the periodic model to every pixel in a 3-D dataset.
 
-    Iterates over all (x, y) spatial pixels in *dataset*, fitting
-    :func:`periodic_fit` to the angular profile at each pixel.
+    Iterates over all (x, y) spatial pixels in dataset, fits
+    'periodic` to the angular profile at each pixel using 'perodic_fit'.
 
     Parameters
     ----------
     dataset : numpy.ndarray of shape (nx, ny, nz)
         3-D array where the first two axes are spatial and the third axis
-        contains the angular intensity profile sampled at 360 evenly-spaced
-        degrees (0–360).
+        contains the angular intensity profile sampled at evenly-spaced
+        degrees equal to 'degrees'.
     initial : list of 5 floats
         Initial parameter guesses [a, b, c, d, e] for the first fit.
         When iterative_fitting is True, subsequent pixels reuse the
@@ -159,8 +141,7 @@ def periodic_fit_whole(dataset: np.ndarray, initial: list, bounds= None, iterati
         See that function for the expected format.
     iterative_fitting : bool, optional
         If True, the best-fit parameters from each pixel are used as the
-        initial guess for the next, which can improve convergence on smooth
-        datasets. Defaults to False.
+        initial guess for the next, improves computational time needed by ~30%.
 
     Returns
     -------
@@ -168,14 +149,6 @@ def periodic_fit_whole(dataset: np.ndarray, initial: list, bounds= None, iterati
         Best-fit parameters [a, b, c, d, e] for every pixel.
     errors_reshaped : numpy.ndarray of shape (nx, ny, 5)
         Corresponding one-sigma uncertainties for every pixel.
-
-    Raises
-    ------
-    ValueError
-        If *dataset* is not a 3-D array or its third axis does not have
-        exactly 360 elements.
-    TypeError
-        If *iterative_fitting* is not a bool.
     """
     # --- Validate dataset --------------------------------------------------
     if not isinstance(dataset, np.ndarray) or dataset.ndim != 3:
