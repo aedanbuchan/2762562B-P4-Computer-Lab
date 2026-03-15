@@ -24,7 +24,7 @@ def decomp_data(path: str, algo: str, plot: bool = False, components: Optional[i
       raise TypeError(f"file path and algorithm need to be strings, got {type(path).__name__!r}")
     if not isinstance(plot, bool):
       raise TypeError(f"plot must be a bool, got {type(plot).__name__!r}.")
-    if components not None and not isinstance(components, int):
+    if components is not None and not isinstance(components, int):
       raise TypeError(f"Components must be integer or left as None for automatic computation")
     
     raw_data = hs.load(path)
