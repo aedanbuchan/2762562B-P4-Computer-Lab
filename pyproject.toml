@@ -12,12 +12,15 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = "MIT"
-license-files = ["LICEN[CS]E*"]
+license-files = []
+
+[tool.setuptools.packages.find]
+include = ["Demo*", "PhysComp*"]
 
 [build-system]
 requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://github.com/aedanbuchan/2762562B-P4-Computer-Lab"
+Issues = "https://github.com/aedanbuchan/2762562B-P4-Computer-Lab/issues"
