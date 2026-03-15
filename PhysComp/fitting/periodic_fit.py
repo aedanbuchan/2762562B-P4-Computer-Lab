@@ -1,3 +1,7 @@
+import numpy as np
+from scipy import optimize
+import matplotlib.pyplot as plt
+
 def sin_model(x, a, b, c, d, e, f, g):
     return a*np.sin(b*np.deg2rad(x) + c) + d + e*np.cos(f*np.deg2rad(x) + g)
 
