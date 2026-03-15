@@ -2,47 +2,222 @@ import numpy as np
 from scipy import optimize
 import matplotlib.pyplot as plt
 
-def sin_model(x, a, b, c, d, e, f, g):
-    return a*np.sin(b*np.deg2rad(x) + c) + d + e*np.cos(f*np.deg2rad(x) + g)
+def periodic(x: np.ndarray, a: float, b: float, c: float, d: float, e: float) -> np.ndarray:
+    """Evaluate a two-component periodic model at position(s) x.
+    The model is the sum of two sine harmonics plus a vertical offset:
 
+        f(x) = a * sin(x + b) + c * sin(2*(x + d)) + e
 
-def periodic_fit_plot(x_variable, y_variable, initial, plot=False):
+    where all angle arguments are converted from degrees to radians
+    before evaluation.
 
-    params, covariance = optimize.curve_fit(
-        sin_model, x_variable, y_variable, p0=initial, maxfev=10000
-    )
+    Parameters
+    ----------
+    x : array-like
+        Input position(s) in degrees.
+    a : float
+        Amplitude of the fundamental (first harmonic).
+    b : float
+        Phase offset of the fundamental, in degrees.
+    c : float
+        Amplitude of the second harmonic.
+    d : float
+        Phase offset of the second harmonic, in degrees.
+    e : float
+        Vertical offset.
 
-    errs = np.sqrt(np.diag(covariance))
+    Returns
+    -------
+    numpy.ndarray
+        Model values at each point in *x*.
 
-    residuals = y_variable - sin_model(x_variable, *params)
-
-    ss_res = np.sum(residuals**2)
-    ss_tot = np.sum((y_variable - np.mean(y_variable))**2)
-    r_squared = 1 - ss_res/ss_tot if ss_tot != 0 else np.nan
-
-    ## Rounding frequencies, ensuring single values at 0/360
-    params_sin[1] = np.round(params_sin[1], decimals=0)
-    params_sin[4] = np.round(params_sin[4], decimals=0)
+    Examples
+    --------
+    >>> import numpy as np
+    >>> x = np.linspace(0, 360, 361)
+    >>> y = periodic(x, a=1.0, b=0.0, c=0.5, d=0.0, e=0.0)
+    >>> float(np.round(y[90], 6))  # sin(90°) = 1
+    1.0
+    """
     
-    if plot:
-        fig, (ax1, ax2) = plt.subplots(
-            2, 1, gridspec_kw={'height_ratios': [2,1]},
-            sharex=True, figsize=(10,6)
+    ## Input Validation
+    if not all(isinstance(v, (int,float)) for v in (a,b,c,d,e)):
+        raise ValueError("Params a, b, c, d, e must be single value floats")
+
+    if not isinstance(x, np.ndarray):
+        raise TypeError(f"x must be a numpy ndarray, got {type(x).__name__!r}")
+
+    return (a * np.sin(np.deg2rad(x + b)) + c * np.sin(2.0 * np.deg2rad(x + d)) + e)
+
+def periodic_fit(x_variable: np.ndarray, y_variable: np.ndarray, initial = None,bounds= None):
+    """Fit the two-harmonic periodic model to data via nonlinear least squares.
+
+    Uses scipy.optimize.curve_fit to find best-fit parameters [a, b, c, d, e]
+    for the model: f(x) = a*sin(x + b) + c*sin(2*(x + d)) + e
+
+    Parameters
+    ----------
+    x_variable : array-like of shape (N,)
+        Independent variable in degrees. Requires at least 5 points.
+    y_variable : array-like of shape (N,)
+        Dependent variable. Must be the same length as x_variable.
+    initial : list of 5 floats, optional
+        Initial parameter guesses [a, b, c, d, e]. Defaults to [30, 5, 5, 0, 70].
+    bounds : 2-tuple of sequences, optional
+        Lower and upper bounds per parameter:
+        ([a_lo, b_lo, c_lo, d_lo, e_lo], [a_hi, b_hi, c_hi, d_hi, e_hi]).
+        Defaults to ([0, -180, 0, -90, 0], [1e6, 180, 1e6, 90, 1e6]).
+
+    Returns
+    -------
+    params : numpy.ndarray of shape (5,)
+        Best-fit parameters [a, b, c, d, e].
+    errors : numpy.ndarray of shape (5,)
+        One-sigma uncertainties derived from the covariance matrix diagonal.
+
+    Raises
+    ------
+    ValueError
+        If inputs are mismatched, malformed, or contain fewer than 5 points.
+    RuntimeError
+        If curve_fit fails to converge within 30 000 function evaluations.
+    """
+    # --- Validate x and y --------------------------------------------------
+    x_variable = np.asarray(x_variable, dtype=float)
+    y_variable = np.asarray(y_variable, dtype=float)
+
+    if x_variable.ndim != 1 or y_variable.ndim != 1:
+        raise ValueError("x_variable and y_variable must both be 1-D arrays.")
+    if len(x_variable) != len(y_variable):
+        raise ValueError(
+            f"x_variable and y_variable must have the same length, "
+            f"got {len(x_variable)} and {len(y_variable)}."
+        )
+    if len(x_variable) < 5:
+        raise ValueError(
+            f"At least 5 data points are required to fit 5 parameters, "
+            f"got {len(x_variable)}."
         )
 
-        dummy = np.linspace(np.min(x_variable), np.max(x_variable), 360)
+    # --- Validate bounds and initial ---------------------------------------
+    if bounds is not None:
+        if not (isinstance(bounds, tuple) and len(bounds) == 2
+                and len(bounds[0]) == 5 and len(bounds[1]) == 5):
+            raise ValueError(
+                "bounds must be a 2-tuple of length-5 sequences: "
+                "([a_lo, b_lo, c_lo, d_lo, e_lo], [a_hi, b_hi, c_hi, d_hi, e_hi])."
+            )
+        if any(lo >= hi for lo, hi in zip(bounds[0], bounds[1])):
+            raise ValueError("Each lower bound must be strictly less than its upper bound.")
 
-        ax1.scatter(x_variable, y_variable, label="Raw Data")
-        ax1.plot(dummy, sin_model(dummy, *params), 'r', label="Fit")
-        ax1.legend(title=f"R² = {r_squared:.4f}")
-        ax1.grid()
+    if initial is not None:
+        if len(initial) != 5 or not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+                                        for v in initial):
+            raise ValueError("initial must be a sequence of exactly 5 numeric scalars.")
 
-        ax2.plot(x_variable, residuals, 'or')
-        ax2.set_xlabel("Angle")
-        ax2.set_ylabel("Residuals")
-        ax2.grid()
+    if bounds is not None:
+        if any(v < lo or v > hi for v, lo, hi in zip(initial, bounds[0], bounds[1])):
+            raise ValueError(f"Initial guesses {list(initial)} contain values outside the "f"specified bounds {bounds}.")
 
-        plt.tight_layout()
-        plt.show()
+    # --- Defaults ----------------------------------------------------------
+    b0 = bounds if bounds is not None else ([0, -180, 0, -90, 0], [1e6, 180, 1e6, 90, 1e6])
+    p0 = initial if initial is not None else [30, 5, 5, 0, 70]
 
-    return params, errs, r_squared
+    # --- Fit ---------------------------------------------------------------
+    try:
+        params_sin, params_sin_covariance = optimize.curve_fit(
+            periodic, x_variable, y_variable, p0=p0, bounds=b0, maxfev=30000
+        )
+    except RuntimeError as exc:
+        raise RuntimeError(
+            "curve_fit did not converge within 30 000 function evaluations. "
+            "Try better initial guesses, relaxed bounds, or more data points. "
+            f"Original error: {exc}"
+        ) from exc
+
+    errs = np.sqrt(np.diag(params_sin_covariance))
+    return params_sin, errs
+
+def periodic_fit_whole(dataset: np.ndarray, initial: list, bounds= None, iterative_fitting = False, degrees = 360) -> tuple[np.ndarray, np.ndarray]:
+    
+    """Fit the periodic model to every pixel in a 3-D dataset.
+
+    Iterates over all (x, y) spatial pixels in *dataset*, fitting
+    :func:`periodic_fit` to the angular profile at each pixel.
+
+    Parameters
+    ----------
+    dataset : numpy.ndarray of shape (nx, ny, nz)
+        3-D array where the first two axes are spatial and the third axis
+        contains the angular intensity profile sampled at 360 evenly-spaced
+        degrees (0–360).
+    initial : list of 5 floats
+        Initial parameter guesses [a, b, c, d, e] for the first fit.
+        When iterative_fitting is True, subsequent pixels reuse the
+        previous pixel's best-fit parameters as the new initial guess.
+    bounds : 2-tuple of sequences, optional
+        Parameter bounds passed directly to :func:`periodic_fit`.
+        See that function for the expected format.
+    iterative_fitting : bool, optional
+        If True, the best-fit parameters from each pixel are used as the
+        initial guess for the next, which can improve convergence on smooth
+        datasets. Defaults to False.
+
+    Returns
+    -------
+    params_reshaped : numpy.ndarray of shape (nx, ny, 5)
+        Best-fit parameters [a, b, c, d, e] for every pixel.
+    errors_reshaped : numpy.ndarray of shape (nx, ny, 5)
+        Corresponding one-sigma uncertainties for every pixel.
+
+    Raises
+    ------
+    ValueError
+        If *dataset* is not a 3-D array or its third axis does not have
+        exactly 360 elements.
+    TypeError
+        If *iterative_fitting* is not a bool.
+    """
+    # --- Validate dataset --------------------------------------------------
+    if not isinstance(dataset, np.ndarray) or dataset.ndim != 3:
+        raise ValueError(
+            f"dataset must be a 3-D numpy array of shape (nx, ny, nz), "
+            f"got {type(dataset).__name__} with "
+            f"{'shape ' + str(dataset.shape) if isinstance(dataset, np.ndarray) else 'no shape'}."
+        )
+    if dataset.shape[2] != degrees:
+        raise ValueError(
+            f"The third axis of dataset must have exactly {degrees} elements "
+            f", got {dataset.shape[2]}."
+        )
+    if not isinstance(iterative_fitting, bool):
+        raise TypeError(
+            f"iterative_fitting must be a bool, got {type(iterative_fitting).__name__!r}."
+        )
+    if bounds is not None:
+        if any(v < lo or v > hi for v, lo, hi in zip(initial, bounds[0], bounds[1])):
+            raise ValueError(f"Initial guesses {list(initial)} contain values outside the "f"specified bounds {bounds}.")
+
+    # --- Setup -------------------------------------------------------------
+    degrees = np.linspace(0, degrees,degrees)
+    nx, ny = dataset.shape[0], dataset.shape[1]
+    params_array = []
+    errors_array = []
+    current_params = initial
+
+    # --- Fit every pixel ---------------------------------------------------
+    with tqdm(total=nx * ny, desc="Processing slices") as pbar:
+        for x in range(nx):
+            for y in range(ny):
+                p0 = current_params if iterative_fitting else initial
+                current_params, errors = periodic_fit(
+                    degrees, dataset[x, y, :], initial=p0, bounds=bounds
+                )
+                params_array.append(current_params)
+                errors_array.append(errors)
+                pbar.update(1)
+
+    # --- Reshape and return ------------------------------------------------
+    params_reshaped = np.array(params_array).reshape(nx, ny, 5)
+    errors_reshaped = np.array(errors_array).reshape(nx, ny, 5)
+    return params_reshaped, errors_reshaped
