@@ -126,7 +126,7 @@ def find_elbow(variance: list):
     - relevant_components : np.ndarray : components to keep (up to and including elbow, use len() to find number of components)
     """
     # ------- Input Validation ----------
-    if varience.ndim != 1:
+    if variance.ndim != 1:
       raise ValueError(f"Varience must be 1-D, got {varience.ndim}-D")
       
     # Setup
