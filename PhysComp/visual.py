@@ -108,7 +108,7 @@ def visualise_params(raw, decomped, num, angle_map = None, amp_map = None, angle
         fig.colorbar(im1, ax=axes[n, 1])
 
 def visualise_residuals(raw,decomped,num):
-      """
+    """
     Allows visualsation of residuals of parameters maps calculated for raw and decomposed data
     
     Parameters
@@ -123,6 +123,7 @@ def visualise_residuals(raw,decomped,num):
     -------
     Plot of raw and decomposed param maps residuals
     """
+    
     fig, axes = plt.subplots(num, 1,figsize=(10,20))
     for n in range(num):
     # Residuals
