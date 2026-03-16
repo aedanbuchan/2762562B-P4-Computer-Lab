@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import PhysComp.fitting as fit
 
 def visualise_dataset(raw,decomped,degree,colour_map="magma"):
