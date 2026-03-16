@@ -47,7 +47,7 @@ def sim_dataset(x_size: int, y_size: int, bins: int, gaussian_noise_std: float, 
     if lam < 0:
         raise ValueError("lam must be float >= 0")
 
-    if filesave and save_path is None:
+    if filesave is True and save_path is None:
         raise ValueError("save_path must be provided if filesave=True")
     
     if not isinstance(seed, int) or not seed > 0:

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import optimize
+from tqdm import tqdm
 
 def periodic(x: np.ndarray, a: float, b: float, c: float, d: float, e: float) -> np.ndarray:
     """Evaluate a two-component periodic model at position(s) x.
