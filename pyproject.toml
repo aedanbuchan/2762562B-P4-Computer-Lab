@@ -1,6 +1,6 @@
 [project]
 name = "P4_Complab_2762562B"
-version = "0.1.9"
+version = "0.1.10"
 authors = [
   { name="2762562B", email="2762562B@student.ac.gla.uk" },
 ]
