@@ -41,3 +41,21 @@ def adjusted_r2(y_true, y_pred, n_params):
     r2_adj = 1 - (1 - r2) * (n - 1) / (n - n_params - 1)
     
     return r2_adj
+
+def signal_leakage(raw: np.ndarray, denoised: np.ndarray):
+    """
+    Total raw variance captured in the residuals as fraction
+    """
+
+    #---- Input validation-------
+    if not all(isinstance(v,np.ndarray) for v in (raw,denoised)):
+        raise TypeError(f"raw and denoised should both be numpy arrays")
+    if np.shape(raw) != np.shape(denoised):
+        raise ValueError(f"raw and denoised must be same shape, got {np.shape(raw} and {np.shape(denoised)}")
+
+    #-----Computation--------
+    noise_power = np.var(raw - denoised)
+    raw_power   = np.var(raw)
+    if raw_power == 0:
+        return 0.0
+    return float(noise_power / raw_power)
