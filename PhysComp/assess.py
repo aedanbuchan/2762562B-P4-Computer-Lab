@@ -51,7 +51,7 @@ def signal_leakage(raw: np.ndarray, denoised: np.ndarray):
     if not all(isinstance(v,np.ndarray) for v in (raw,denoised)):
         raise TypeError(f"raw and denoised should both be numpy arrays")
     if np.shape(raw) != np.shape(denoised):
-        raise ValueError(f"raw and denoised must be same shape, got {np.shape(raw} and {np.shape(denoised)}")
+        raise ValueError(f"raw and denoised must be same shape, got {np.shape(raw)} and {np.shape(denoised)}")
 
     #-----Computation--------
     noise_power = np.var(raw - denoised)
