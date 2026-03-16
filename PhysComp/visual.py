@@ -123,9 +123,7 @@ def visualise_residuals(raw,decomped,num):
     -------
     Plot of raw and decomposed param maps residuals
     """
-    
     fig, axes = plt.subplots(num, 1,figsize=(10,20))
-
     for n in range(num):
     # Residuals
         im0 = axes[n].imshow(raw[:, :, n]-decomped[:, :, n],cmap='magma')
