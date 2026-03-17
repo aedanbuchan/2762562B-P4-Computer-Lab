@@ -1,5 +1,20 @@
+"""
+The functions contained within this file are all related to assessing 
+the decomposition of a signal and the assossiated fits.
+
+Each function includes a description of the method alongside the required
+inputs and outputs. Demonstrations of each function can be found in the 
+assess demo notebook in the Demos folder
+"""
+
+"""
+--------- Required imports for this file ---------
+"""
 import numpy as np
 
+"""
+-------- Functions --------
+"""
 def adjusted_r2(y_true, y_pred, n_params):
     """
     Compute adjusted R-squared for a model.
