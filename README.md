@@ -6,6 +6,7 @@ to denoise azimuthal electron datasets.
 
 ### Dependencies
 The following packages are needed for this package to run (These are already declared in the .toml file):
+\\
 *numpy >= 2.0.2*
 *matplotlib>=3.9.2*
 *scipy>=1.13.1*
