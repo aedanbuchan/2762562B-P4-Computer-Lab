@@ -1,6 +1,23 @@
+"""
+The functions contained within this file are all related to assessing 
+the visualastion of a signal or dataset.
+
+Each function includes a description of the method alongside the required
+inputs and outputs. Demonstrations of each function can be found in the 
+visual demo notebook in the Demos folder
+"""
+
+"""
+--------- Required imports for this file ---------
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import PhysComp.fitting as fit
+
+"""
+-------- Functions ---------
+"""
 
 def visualise_dataset(raw,decomped,degree,colour_map="magma"):
     """
