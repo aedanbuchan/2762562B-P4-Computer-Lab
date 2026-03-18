@@ -24,7 +24,7 @@ import PhysComp.visual as vs
 
 """------ Functions------"""
 
-def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_visual=False,residual=False ,components=None,initial= None,r2=False,signalleak=False, bounds= None, angle_map = None, amp_map=None,angle_amp = None,verbose=False):
+def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_visual=False,residual=False ,components=None,initial= None,r2=False,signalleak=False, bounds= None, angle_map = None, amp_map=None,angle_amp = None,verbose=False,iterative_fitting = False):
 
     """
     Master function which decomposes dataset and fits periodic function to each pixel. Various other features including visualastion and assessment.
@@ -99,13 +99,13 @@ def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_vi
     logger.debug("Fitting Decomped Data...")
     
     try:
-        decomped_params, decomped_errors = fit.periodic_fit_whole(decomped_data,initial,bounds)
+        decomped_params, decomped_errors = fit.periodic_fit_whole(decomped_data,initial,bounds,iterative_fitting=iterative_fitting)
     except Exception as e:
         raise RuntimeError(f"Periodic fit failed on Decomposed data: {e}") from e
     logger.debug("Fitting Raw Data...")
 
     try:
-        raw_params, raw_errors = fit.periodic_fit_whole(raw_data,initial,bounds)
+        raw_params, raw_errors = fit.periodic_fit_whole(raw_data,initial,bounds,iterative_fitting=iterative_fitting)
     except Exception as e:
         raise RuntimeError(f"Periodic fit failed on raw data: {e}") from e
 
