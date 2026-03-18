@@ -79,6 +79,8 @@ def visualise_params(raw, decomped, num, name, angle_map = None, amp_map = None,
         Decomposed parameter dataset, shape (x, y, n_params), first output of fit.periodic_fit_whole
     num: int
         Number of parameters in fit
+    name: str
+        Name used in plot in form "raw/decomped {name} {index}", typically "paramater" or "parameter error"
     angle_map,amp_map : str
         Colour map applied to the angle and amplitude parameters respectively
         Defaults to "twilight" and "inferno"
