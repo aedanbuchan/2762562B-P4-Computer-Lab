@@ -1,9 +1,23 @@
+"""
+The functions contained within this file are all related to simulating an
+azimuthal scattering dataset.
+
+Each function includes a description of the method alongside the required
+inputs and outputs. Demonstrations of each function can be found in the 
+sim demo notebook in the Demos folder
+"""
+
+"""
+--------- Required imports for this file ---------
+"""
 import numpy as np
 import numpy as np
 from pathlib import Path
 from typing import Tuple, Dict, Optional
 
-
+"""
+-------- Functions --------
+"""
 def sim_dataset(x_size: int, y_size: int, bins: int, gaussian_noise_std: float, lam: float, filesave: bool = False, save_path: Optional[str] = None, seed: Optional[int] = None):
     """
     Simulate a 3D detector dataset with azimuthal sinusoidal signals and noise.

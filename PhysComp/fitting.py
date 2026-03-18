@@ -1,3 +1,15 @@
+"""
+The functions contained within this file are all related to fitting a 
+two fold periodic function over both singl signals and whole datasets.
+
+Each function includes a description of the method alongside the required
+inputs and outputs. Demonstrations of each function can be found in the 
+Fitting demo notebook in the Demos folder
+"""
+
+"""
+--------- Required imports for this file ---------
+"""
 import numpy as np
 from scipy import optimize
 from tqdm import tqdm
