@@ -31,7 +31,10 @@ The files are the following:
 
 **visual.py** - Functions relating to visualising the data, both 3D and 2D
 
-Within this package there is a "Demo" folder on the top level containing notebooks demonstrating the useage of each function 
+**pipeline.py** - Functions relating to the pipeline function which runs through the entire process.
+
+Within this package there is a "Demo" folder on the top level containing notebooks demonstrating the useage of each function with simulated data.
+The pipeline demo notebook is conducted on the real data used in this project to demonstrate outcomes and usefulness.
 
 ### Installation
 This package should install on a python terminal with the following command:
