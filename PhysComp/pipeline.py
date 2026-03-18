@@ -105,7 +105,7 @@ def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_vi
     logger.debug("Fitting Raw Data...")
 
     try:
-        raw_params, raw_errors = fit.periodic_fit_plot_whole(raw_data,initial,bounds)
+        raw_params, raw_errors = fit.periodic_fit_whole(raw_data,initial,bounds)
     except Exception as e:
         raise RuntimeError(f"Periodic fit failed on raw data: {e}") from e
 
