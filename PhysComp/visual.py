@@ -67,7 +67,7 @@ def visualise_dataset(raw,decomped,degree,colour_map="magma"):
 
     plt.tight_layout()
     
-def visualise_params(raw, decomped, num, angle_map = None, amp_map = None, angle_amp = None):
+def visualise_params(raw, decomped, num, name, angle_map = None, amp_map = None, angle_amp = None):
     """
     Allows visualsation of fitting parameters map calculated for raw and decomposed data
     
@@ -117,12 +117,12 @@ def visualise_params(raw, decomped, num, angle_map = None, amp_map = None, angle
 
     # Raw
         im0 = axes[n, 0].imshow(raw[:, :, n],cmap=maps[n])
-        axes[n, 0].set_title(f'Raw Parameter {n}')
+        axes[n, 0].set_title(f'Raw {name} {n}')
         fig.colorbar(im0, ax=axes[n, 0])
 
     # Decomposed
         im1 = axes[n, 1].imshow(decomped[:, :, n],cmap=maps[n])
-        axes[n, 1].set_title(f'Decomposed Parameter {n}')
+        axes[n, 1].set_title(f'Decomposed {name} {n}')
         fig.colorbar(im1, ax=axes[n, 1])
 
 def visualise_residuals(raw,decomped,num):
