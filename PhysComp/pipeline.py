@@ -99,7 +99,7 @@ def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_vi
     logger.debug("Fitting Decomped Data...")
     
     try:
-        decomped_params, decomped_errors = fit.periodic_fit_plot_whole(decomped_data,initial,bounds)
+        decomped_params, decomped_errors = fit.periodic_fit_whole(decomped_data,initial,bounds)
     except Exception as e:
         raise RuntimeError(f"Periodic fit failed on Decomposed data: {e}") from e
     logger.debug("Fitting Raw Data...")
