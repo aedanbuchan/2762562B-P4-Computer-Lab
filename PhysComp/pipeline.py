@@ -119,8 +119,8 @@ def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_vi
         for nx in range(np.shape(raw_data)[0]):
             for ny in range(np.shape(raw_data)[1]):
                 try:
-                    raw_r2s.append(assess.adjusted_r2(raw_data[nx][ny],fit.periodic(X,*raw_params[nx][ny])))
-                    decomped_r2s.append(assess.adjusted_r2(decomped_data[nx][ny],fit.periodic(X,*decomped_params[nx][ny])))
+                    raw_r2s.append(assess.adjusted_r2(raw_data[nx][ny],fit.periodic(X,*raw_params[nx][ny]),5))
+                    decomped_r2s.append(assess.adjusted_r2(decomped_data[nx][ny],fit.periodic(X,*decomped_params[nx][ny]),5))
                 except Exception as e:
                     raise RuntimeError(f"R2 calculation failed at pixel ({nx} , {ny}): {e}") from e
 
