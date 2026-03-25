@@ -83,12 +83,12 @@ def get_components(decomposed_obj, components: int, degree: int = 0, pixel: list
         if plot:
             # Spatial map at given degree
             im0 = axes[c, 0].imshow(components_data[:, :, degree], cmap="magma")
-            axes[c, 0].set_title(f'Raw Parameter {c}')
+            axes[c, 0].set_title(f'Component {c}, Degree Slice {degree}')
             fig.colorbar(im0, ax=axes[c, 0])
 
             # Spectrum at given pixel
             axes[c, 1].plot(components_data[pixel[0], pixel[1], :])
-            axes[c, 1].set_title(f'Decomposed Parameter {c}')
+            axes[c, 1].set_title(f'Component {c}, Pixel {pixel}')
 
         components_array.append(components_data)
 
