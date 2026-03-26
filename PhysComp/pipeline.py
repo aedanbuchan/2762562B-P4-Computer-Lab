@@ -137,16 +137,16 @@ def decomp_fit_pipeline(path,algo,scree_plot=False,param_visual = False,error_vi
    ## ---------- Visualisation -------------
     if param_visual == True:
         logger.debug("Visualising Paramater...")
-        vs.visualise_params(raw_params,decomped_params,"Parameter",5,angle_map=angle_map,amp_map=amp_map,angle_amp=angle_amp)
+        vs.visualise_params(raw_params,decomped_params,5,"Parameter",angle_map=angle_map,amp_map=amp_map,angle_amp=angle_amp)
 
     if error_visual == True:
         logger.debug("Visualising Errors...")
-        vs.visualise_params(raw_errors,decomped_errors,"Parameter Error",5,angle_map=angle_map,amp_map=amp_map,angle_amp=angle_amp)
+        vs.visualise_params(raw_errors,decomped_errors,5,"Parameter Error",angle_map=angle_map,amp_map=amp_map,angle_amp=angle_amp)
 
     if residual == True:
         logger.debug("Visualising Residuals...")
-        vs.visualise_residuals(raw_params,decomped_params,5,"Parameter")
-        vs.visualise_residuals(raw_errors,decomped_errors,5,"Residuals")
+        vs.visualise_residuals(raw_params,decomped_params,5)
+        vs.visualise_residuals(raw_errors,decomped_errors,5)
 
     return {
         "decomped_data":    decomped_data,
