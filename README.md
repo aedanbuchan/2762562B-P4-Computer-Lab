@@ -47,3 +47,7 @@ This package was developed for use with 3D numpy arrays which contain two spatia
 ### Installation
 This package should install on a python terminal with the following command:
 - "pip install git+https://github.com/aedanbuchan/2762562B-P4-Computer-Lab.git"
+
+When installed the packages can be imported by using:
+- "Import PhysComp.fitting as fit"
+Replacing fitting with the desired package and fit with the desired abbreviation.
