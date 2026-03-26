@@ -64,8 +64,9 @@ def sim_dataset(x_size: int, y_size: int, bins: int, gaussian_noise_std: float, 
     if filesave is True and save_path is None:
         raise ValueError("save_path must be provided if filesave=True")
     
-    if not isinstance(seed, int) or not seed > 0:
-        raise ValueError("Seed must be positive integer.")
+    if seed is not None:
+        if not isinstance(seed, int) or not seed > 0:
+            raise ValueError("Seed must be positive integer.")
     # --------------------------
 
     # Generating randomness
